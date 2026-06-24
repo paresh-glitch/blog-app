@@ -1,0 +1,79 @@
+name: ci
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: install and lint
+        run: |
+          npm ci
+          npx eslint .
+
+  build:
+    runs-on: ubuntu-latest
+    needs: lint
+    env:
+      ENV_NAME: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: build node image
+        run: docker build -t ${{ env.ENV_NAME }}-app .
+
+      - name: build nginx image
+        run: docker build -t ${{ env.ENV_NAME }}-nginx ./nginx/
+
+      - name: scan docker images
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.ENV_NAME }}-app
+          exit-code: '1'
+          severity: CRITICAL
+
+      - name: scan nginx images
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.ENV_NAME }}-nginx
+          exit-code: '1'
+          severity: CRITICAL
+
+      - name: Configure AWS credentials
+        if: github.event_name == 'push'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: login to ecr
+        if: github.event_name == 'push'
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: push node image
+        if: github.event_name == 'push'
+        run: |
+          docker tag ${{ env.ENV_NAME }}-app:latest ${{ vars.ECR_REGISTRY }}/${{ env.ENV_NAME }}-app:${{ github.sha }}
+          docker push ${{ vars.ECR_REGISTRY }}/${{ env.ENV_NAME }}-app:${{ github.sha }}
+
+      - name: push nginx image
+        if: github.event_name == 'push'
+        run: |
+          docker tag ${{ env.ENV_NAME }}-nginx:latest ${{ vars.ECR_REGISTRY }}/${{ env.ENV_NAME }}-nginx:${{ github.sha }}
+          docker push ${{ vars.ECR_REGISTRY }}/${{ env.ENV_NAME }}-nginx:${{ github.sha }}
+
+    outputs:
+      image_tag: ${{ github.sha }}
+      env_name: ${{ env.ENV_NAME }}
