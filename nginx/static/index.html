@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My App</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--accent:#6C63FF;--accent-soft:rgba(108,99,255,0.1);--accent-border:rgba(108,99,255,0.3);--teal:#14b8a6;--teal-soft:rgba(20,184,166,0.1);--surface-0:#f8f8f7;--surface-1:#f1f0ee;--surface-2:#ffffff;--text-primary:#1a1a18;--text-secondary:#5f5e5a;--text-muted:#88877f;--border:rgba(0,0,0,0.08);--border-strong:rgba(0,0,0,0.13);--border-stronger:rgba(0,0,0,0.2);--radius:8px}
+@media(prefers-color-scheme:dark){:root{--surface-0:#1a1a18;--surface-1:#222220;--surface-2:#2c2c2a;--text-primary:#f1f0ee;--text-secondary:#b4b2a9;--text-muted:#5f5e5a;--border:rgba(255,255,255,0.08);--border-strong:rgba(255,255,255,0.13);--border-stronger:rgba(255,255,255,0.2)}}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--surface-0);color:var(--text-primary);min-height:100vh;display:flex;flex-direction:column}
+.layout{display:grid;grid-template-columns:200px 1fr;min-height:100vh}
+.sidebar{background:var(--surface-1);border-right:0.5px solid var(--border);padding:1.25rem 0;display:flex;flex-direction:column;position:fixed;top:0;left:0;width:200px;height:100vh}
+.brand{padding:0 1.25rem 1.25rem;border-bottom:0.5px solid var(--border);margin-bottom:0.75rem}
+.brand-name{font-size:15px;font-weight:500;color:var(--text-primary);letter-spacing:-0.01em}
+.brand-sub{font-size:11px;color:var(--text-muted);margin-top:2px}
+.nav-section{padding:0 0.75rem;margin-bottom:0.5rem}
+.nav-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;padding:0 0.5rem;margin-bottom:4px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius);cursor:pointer;font-size:13px;font-weight:500;color:var(--text-secondary);transition:all 0.1s;border:none;background:none;width:100%;text-align:left}
+.nav-item i{font-size:16px;opacity:0.7;pointer-events:none}
+.nav-item:hover{background:var(--surface-2);color:var(--text-primary)}
+.nav-item.active{background:var(--accent-soft);color:var(--accent);border:0.5px solid var(--accent-border)}
+.nav-item.active i{opacity:1}
+.nav-count{margin-left:auto;font-size:11px;font-weight:500;background:var(--surface-2);color:var(--text-muted);padding:1px 6px;border-radius:99px;border:0.5px solid var(--border)}
+.nav-item.active .nav-count{background:var(--accent-soft);color:var(--accent);border-color:var(--accent-border)}
+.sidebar-bottom{margin-top:auto;padding:0.75rem 1rem;border-top:0.5px solid var(--border)}
+.status-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block;margin-right:6px}
+.status-text{font-size:11px;color:var(--text-muted)}
+.main{margin-left:200px;display:flex;flex-direction:column;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-bottom:0.5px solid var(--border);background:var(--surface-2);position:sticky;top:0;z-index:10}
+.page-title{font-size:15px;font-weight:500}
+.icon-btn{width:32px;height:32px;border-radius:var(--radius);border:0.5px solid var(--border);background:var(--surface-1);color:var(--text-secondary);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.1s}
+.icon-btn:hover{background:var(--surface-0);color:var(--text-primary);border-color:var(--border-strong)}
+.content{padding:1.5rem;flex:1}
+.section{display:none}
+.section.active{display:block}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.stat-card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:1rem 1.25rem}
+.stat-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:16px}
+.stat-card.purple .stat-icon{background:var(--accent-soft);color:var(--accent)}
+.stat-card.teal .stat-icon{background:var(--teal-soft);color:var(--teal)}
+.stat-num{font-size:28px;font-weight:500;line-height:1;color:var(--text-primary)}
+.stat-lbl{font-size:12px;color:var(--text-muted);margin-top:4px}
+.panel{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1.25rem}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:12px 1.25rem;border-bottom:0.5px solid var(--border)}
+.panel-title{font-size:13px;font-weight:500;color:var(--text-primary)}
+.panel-body{padding:1.25rem}
+.field{margin-bottom:12px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--text-secondary);margin-bottom:5px}
+.field input,.field textarea,.field select{width:100%;padding:7px 10px;font-size:13px;border:0.5px solid var(--border-strong);border-radius:var(--radius);background:var(--surface-1);color:var(--text-primary);font-family:inherit;transition:border-color 0.15s,box-shadow 0.15s}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.field textarea{resize:vertical;min-height:72px;line-height:1.5}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.row{display:flex;gap:10px}
+.row .field{flex:1}
+.btn{padding:7px 14px;font-size:13px;font-weight:500;border-radius:var(--radius);cursor:pointer;border:0.5px solid var(--border-strong);background:var(--surface-1);color:var(--text-secondary);transition:all 0.1s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--surface-0);color:var(--text-primary)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{opacity:0.9}
+.btn.primary:active{transform:scale(0.98)}
+.btn-row{display:flex;justify-content:flex-end;gap:8px;padding-top:12px;border-top:0.5px solid var(--border);margin-top:12px}
+.list-row{display:flex;align-items:center;padding:10px 1.25rem;border-bottom:0.5px solid var(--border);gap:10px;transition:background 0.1s}
+.list-row:last-child{border-bottom:none}
+.list-row:hover{background:var(--surface-1)}
+.avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0}
+.avatar.purple{background:var(--accent-soft);color:var(--accent)}
+.avatar.teal{background:var(--teal-soft);color:var(--teal)}
+.list-main{flex:1;min-width:0}
+.list-name{font-size:13px;font-weight:500;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-sub{font-size:11px;color:var(--text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{font-size:10px;font-weight:500;padding:2px 7px;border-radius:99px;flex-shrink:0}
+.badge.purple{background:var(--accent-soft);color:var(--accent);border:0.5px solid var(--accent-border)}
+.badge.gray{background:var(--surface-1);color:var(--text-muted);border:0.5px solid var(--border)}
+.empty-state{padding:2.5rem 1.25rem;text-align:center}
+.empty-state i{font-size:32px;color:var(--text-muted);opacity:0.4;display:block;margin-bottom:8px}
+.empty-state p{font-size:13px;color:var(--text-muted)}
+.activity-header{padding:12px 1.25rem;border-bottom:0.5px solid var(--border)}
+.activity-title{font-size:13px;font-weight:500}
+.activity-row{display:flex;align-items:flex-start;gap:10px;padding:10px 1.25rem;border-bottom:0.5px solid var(--border)}
+.activity-row:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.activity-dot.purple{background:var(--accent)}
+.activity-dot.teal{background:var(--teal)}
+.activity-text{font-size:13px;color:var(--text-primary);line-height:1.4}
+.activity-time{font-size:11px;color:var(--text-muted);margin-top:2px}
+.toast{position:fixed;bottom:1.25rem;right:1.25rem;padding:10px 14px;border-radius:var(--radius);font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;opacity:0;transform:translateY(6px);transition:all 0.2s;pointer-events:none;z-index:99;border:0.5px solid;background:var(--surface-2)}
+.toast.success{border-color:#22c55e;color:#22c55e}
+.toast.error{border-color:#ef4444;color:#ef4444}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-name">My App</div>
+      <div class="brand-sub">Admin dashboard</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Menu</div>
+      <button class="nav-item active" onclick="nav('overview',this)" id="nav-overview"><i class="ti ti-layout-dashboard"></i>Overview<span class="nav-count" id="nc-overview">—</span></button>
+      <button class="nav-item" onclick="nav('users',this)" id="nav-users"><i class="ti ti-users"></i>Users<span class="nav-count" id="nc-users">—</span></button>
+      <button class="nav-item" onclick="nav('posts',this)" id="nav-posts"><i class="ti ti-file-text"></i>Posts<span class="nav-count" id="nc-posts">—</span></button>
+    </div>
+    <div class="sidebar-bottom">
+      <span class="status-dot"></span><span class="status-text">API connected</span>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <span class="page-title" id="page-title">Overview</span>
+      <button class="icon-btn" onclick="refresh()" title="Refresh"><i class="ti ti-refresh"></i></button>
+    </div>
+    <div class="content">
+
+      <div id="sec-overview" class="section active">
+        <div class="grid-2">
+          <div class="stat-card purple">
+            <div class="stat-icon"><i class="ti ti-users"></i></div>
+            <div class="stat-num" id="s-users">—</div>
+            <div class="stat-lbl">Total users</div>
+          </div>
+          <div class="stat-card teal">
+            <div class="stat-icon"><i class="ti ti-file-text"></i></div>
+            <div class="stat-num" id="s-posts">—</div>
+            <div class="stat-lbl">Total posts</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="activity-header"><div class="activity-title">Recent activity</div></div>
+          <div id="activity-list"><div class="empty-state"><i class="ti ti-clock"></i><p>Activity will appear here as you create users and posts.</p></div></div>
+        </div>
+      </div>
+
+      <div id="sec-users" class="section">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Create user</span></div>
+          <div class="panel-body">
+            <div class="row">
+              <div class="field"><label>Name</label><input id="u-name" type="text" placeholder="Alex Johnson"></div>
+              <div class="field"><label>Email</label><input id="u-email" type="email" placeholder="alex@example.com"></div>
+            </div>
+            <div class="btn-row"><button class="btn primary" onclick="createUser()"><i class="ti ti-plus"></i>Create user</button></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">All users</span><span class="badge gray" id="user-badge">0</span></div>
+          <div id="user-list"><div class="empty-state"><i class="ti ti-users"></i><p>No users yet. Create one above.</p></div></div>
+        </div>
+      </div>
+
+      <div id="sec-posts" class="section">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Create post</span></div>
+          <div class="panel-body">
+            <div class="field"><label>Title</label><input id="p-title" type="text" placeholder="My first post"></div>
+            <div class="field"><label>Content</label><textarea id="p-content" placeholder="Write something..."></textarea></div>
+            <div class="field"><label>Author</label><select id="p-author"><option value="">Select a user</option></select></div>
+            <div class="btn-row"><button class="btn primary" onclick="createPost()"><i class="ti ti-plus"></i>Create post</button></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">All posts</span><span class="badge gray" id="post-badge">0</span></div>
+          <div id="post-list"><div class="empty-state"><i class="ti ti-file-text"></i><p>No posts yet. Create one above.</p></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+let users=[],posts=[];
+const titles={overview:'Overview',users:'Users',posts:'Posts'};
+
+function nav(id,el){
+  const btn=el.closest('.nav-item')||el;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('sec-'+id).classList.add('active');
+  document.getElementById('page-title').textContent=titles[id];
+}
+
+function toast(msg,type='success'){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.className='toast '+type+' show';
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+function initials(name){return name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)}
+
+function timeAgo(d){
+  const s=Math.floor((Date.now()-new Date(d))/1000);
+  if(s<60)return'just now';
+  if(s<3600)return Math.floor(s/60)+'m ago';
+  if(s<86400)return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+
+async function apiFetch(path,opts={}){
+  const res=await fetch('/api'+path,{headers:{'Content-Type':'application/json'},...opts});
+  if(!res.ok)throw new Error(await res.text());
+  return res.json();
+}
+
+async function loadUsers(){
+  try{
+    users=await apiFetch('/users');
+    document.getElementById('s-users').textContent=users.length;
+    document.getElementById('nc-users').textContent=users.length;
+    document.getElementById('user-badge').textContent=users.length;
+    renderUsers();populateAuthorSelect();renderActivity();
+  }catch(e){document.getElementById('s-users').textContent='?'}
+}
+
+async function loadPosts(){
+  try{
+    posts=await apiFetch('/posts');
+    document.getElementById('s-posts').textContent=posts.length;
+    document.getElementById('nc-posts').textContent=posts.length;
+    document.getElementById('post-badge').textContent=posts.length;
+    renderPosts();renderActivity();
+  }catch(e){document.getElementById('s-posts').textContent='?'}
+}
+
+function renderUsers(){
+  const el=document.getElementById('user-list');
+  if(!users.length){el.innerHTML='<div class="empty-state"><i class="ti ti-users"></i><p>No users yet. Create one above.</p></div>';return}
+  el.innerHTML=users.map(u=>`
+    <div class="list-row">
+      <div class="avatar purple">${initials(u.name)}</div>
+      <div class="list-main">
+        <div class="list-name">${u.name}</div>
+        <div class="list-sub">${u.email}</div>
+      </div>
+      <span class="badge purple">user</span>
+    </div>`).join('');
+}
+
+function renderPosts(){
+  const el=document.getElementById('post-list');
+  if(!posts.length){el.innerHTML='<div class="empty-state"><i class="ti ti-file-text"></i><p>No posts yet. Create one above.</p></div>';return}
+  el.innerHTML=posts.map(p=>{
+    const author=typeof p.author==='object'?p.author.name:(users.find(u=>u._id===p.author)?.name||'Unknown');
+    return`<div class="list-row">
+      <div class="avatar teal"><i class="ti ti-file-text" style="font-size:14px"></i></div>
+      <div class="list-main">
+        <div class="list-name">${p.title}</div>
+        <div class="list-sub">by ${author} · ${p.content.slice(0,55)}${p.content.length>55?'…':''}</div>
+      </div>
+      <span class="badge gray">${timeAgo(p.createdAt)}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderActivity(){
+  const el=document.getElementById('activity-list');
+  const total=users.length+posts.length;
+  document.getElementById('nc-overview').textContent=total;
+  if(!total){el.innerHTML='<div class="empty-state"><i class="ti ti-clock"></i><p>Activity will appear here as you create users and posts.</p></div>';return}
+  const items=[
+    ...users.map(u=>({type:'user',label:'New user: '+u.name,time:u.createdAt})),
+    ...posts.map(p=>({type:'post',label:'New post: '+p.title,time:p.createdAt}))
+  ].sort((a,b)=>new Date(b.time)-new Date(a.time)).slice(0,8);
+  el.innerHTML=items.map(i=>`
+    <div class="activity-row">
+      <div class="activity-dot ${i.type==='user'?'purple':'teal'}"></div>
+      <div>
+        <div class="activity-text">${i.label}</div>
+        <div class="activity-time">${timeAgo(i.time)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function populateAuthorSelect(){
+  const sel=document.getElementById('p-author');
+  sel.innerHTML='<option value="">Select a user</option>'+users.map(u=>`<option value="${u._id}">${u.name}</option>`).join('');
+}
+
+async function createUser(){
+  const name=document.getElementById('u-name').value.trim();
+  const email=document.getElementById('u-email').value.trim();
+  if(!name||!email){toast('Name and email are required','error');return}
+  try{
+    await apiFetch('/users',{method:'POST',body:JSON.stringify({name,email})});
+    document.getElementById('u-name').value='';
+    document.getElementById('u-email').value='';
+    toast('User created');loadUsers();
+  }catch(e){toast('Failed to create user','error')}
+}
+
+async function createPost(){
+  const title=document.getElementById('p-title').value.trim();
+  const content=document.getElementById('p-content').value.trim();
+  const author=document.getElementById('p-author').value;
+  if(!title||!content||!author){toast('All fields are required','error');return}
+  try{
+    await apiFetch('/posts',{method:'POST',body:JSON.stringify({title,content,author})});
+    document.getElementById('p-title').value='';
+    document.getElementById('p-content').value='';
+    document.getElementById('p-author').value='';
+    toast('Post created');loadPosts();
+  }catch(e){toast('Failed to create post','error')}
+}
+
+function refresh(){loadUsers();loadPosts();toast('Refreshed')}
+
+loadUsers();loadPosts();
+</script>
+</body>
+</html>
+
